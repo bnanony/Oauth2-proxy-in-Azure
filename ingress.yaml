@@ -1,0 +1,6 @@
+annotations:
+nginx. ingress.kubernetes.io/auth-url: "https:/$host/oauth2/auth"
+nginx.ingress.kubernetes.io/auth-signin: "https://Shost/oauth2/start?rd=$escaped_request_uri"
+nginx.ingress.kubernetes.10/configuration-snippet:
+auth_request_set $token_upstream_http_x_auth_request_access_token;
+proxy_set_header Authorization "Bearer $token".
