@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.i0/v1beta1
+kind: Ingress
+metadata:
+  name: your_ingress_name
+  namespace: your_namespace
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/auth-url: "https://$host/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$escaped_request_uri"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      auth_request_set $token $upstream_http_ x_auth_request_access_token;
+      proxy_set_header Authorization "Bearer $token";
+spec:
+  tls:
+    - hosts: TLS_HOST
+      secretName: TLS_SECRET
+  rules:
+    - host: your_host
+      http:
+        paths:
+          - path: /YOUR PATH PREFIX/.
+            backend:
+              serviceName: your_service_name
+              servicePort: your_service_port
+            pathType: Prefix
