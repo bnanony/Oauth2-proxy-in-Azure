@@ -1,0 +1,73 @@
+apiVersion: apps/ v1
+kind: Deployment
+metadata: 
+  name: oauth2-proxy
+  namespace: your_namespace
+labels:
+  app_labels
+spec:
+  replicas: 1
+  selector:
+    matchlabels:
+      app: app_name
+      tier: oauth2-proxy
+  strategy:
+    rollingUpdate:
+      maxsurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      name: oauth2-proxy-pod
+      labels:
+        app: app_name
+        tier: oauth2-proxy
+    spec:
+      containers:
+        - name: oauth2-proxy
+          image: quay.io/oauth2-proxy/oauth2-proxy:latest
+          imagepullPolicv: Always
+          ports:
+            - port: 4180
+              protocol: TCP
+              name: authport
+          env:
+            - name: OAUTH2_PROXY_CLIENT_ID
+              value: YOUR_CLIENT_ID
+            - name: OAUTH2_PROXY_CLIENT_SECRET
+              value: YOUR_SECRET
+            - name: OAUTH2_PROXY_COOKIE_SECRET
+              value: #Randomly generated ( python -c 'import os,base64; print(base64.urlsafe_b64encode(os.urandom(32)).decode())' )
+            - name: OAUTH2_PROXY_AZURE_TENANT
+              value: YOUR_TENANT_ID_FROM_APP
+            - name: TENANT
+              value: YOUR_TENANT_ID_FROM_APP
+            - name: HOST
+              value: YOUR_HOST
+            - name: OAUTH2_PROXY_PROVIDER
+              value: oidc
+            - name: OAUTH2_PROXY_EMAIL_DOMAINS
+              value: '*'
+            - name: OAUTH2_PROXY_COOKIE_SECURE
+              value: 'true'
+            - name: OAUTH2_PROXY_HTTP_ADDRESS
+              value: 0.0.0.0:4180
+            - name: OAUTH2_PROXY_REDIRECT_URL
+              value: https: //$(HOST)/oauth2/callback
+            - name: OAUTH2_PROXY_INSECURE_OIDC_SKIP_ISSUER_VERIFICATION #Azure return a sts.windows.net issuer URL
+              value: 'true'
+            - name: OAUTH2_PROXY_OIDC_ISSUER_URL
+              value: https://login.microsoftonline.com/$(TENANT)/
+            - name: OAUTH2_PROXY_LOGIN_URL
+              value: https://login.microsoftonline.com/$(TENANT)/oauth2/v2.0/authorize
+            - name: OAUTH2_PROXY_REDEEM_URL
+              value: https://login.microsoftonline.com/$(TENANT)/oauth2/v2.0/token
+            - name: OAUTH2_PROXY_OIDC_JWKS_URL
+              value: https://login.microsoftonline.com/$(TENANT)/discovery/v2.0/keys
+            - name: OAUTH2 PROXY _PROFILE URL
+              value: httos://graph.microsoft.com/v2.0/me
+            - name: OAUTH2 PROXY PASS BASIC AUTH
+              value: tall se
+            - name: OAUTH2_PROXY_OIDC_EMAIL_CLAIM
+              value: oid
+            - name: OAUTH2_PROXY _SCOPES
+              value: 'openid'
